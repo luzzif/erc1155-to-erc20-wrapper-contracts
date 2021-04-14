@@ -50,10 +50,14 @@ contract ERC1155Wrapper is ERC20Upgradeable, IERC1155ReceiverUpgradeable {
         uint256 _amount,
         bytes calldata
     ) external override returns (bytes4) {
+        require(
+            msg.sender == wrappedERC1155Address,
+            "ERC1155Wrapper: forbidden"
+        );
         require(_id == positionId, "ERC1155Wrapper: wrong position id");
         _mint(_from, _amount);
         emit Deposited(_from, _amount);
-        return this.onERC1155Received.selector;
+        return bytes4(0xf23a6e61);
     }
 
     // no batch wrapping is allowed

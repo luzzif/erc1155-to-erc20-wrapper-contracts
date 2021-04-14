@@ -1,5 +1,5 @@
 require("dotenv").config();
-require("@nomiclabs/hardhat-truffle5");
+require("@nomiclabs/hardhat-waffle");
 require("solidity-coverage");
 require("hardhat-gas-reporter");
 require("@nomiclabs/hardhat-etherscan");
@@ -9,9 +9,6 @@ const infuraId = process.env.INFURA_ID;
 
 module.exports = {
     networks: {
-        mainnet: {
-            url: `https://mainnet.infura.io/v3/${infuraId}`,
-        },
         rinkeby: {
             url: `https://rinkeby.infura.io/v3/${infuraId}`,
             accounts: [process.env.PRIVATE_KEY],

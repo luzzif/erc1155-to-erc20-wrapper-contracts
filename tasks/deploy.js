@@ -12,16 +12,20 @@ task(
         await hre.run("clean");
         await hre.run("compile");
 
-        const ERC1155Wrapper = hre.artifacts.require("ERC1155Wrapper");
-        const wrapperImplementation = await ERC1155Wrapper.new();
+        const ERC1155Wrapper = await hre.ethers.getContractFactory(
+            "ERC1155Wrapper"
+        );
+        const wrapperImplementation = await ERC1155Wrapper.deploy();
+        await wrapperImplementation.deployed();
 
-        const ERC1155WrapperFactory = hre.artifacts.require(
+        const ERC1155WrapperFactory = await hre.ethers.getContractFactory(
             "ERC1155WrapperFactory"
         );
-        const factory = await ERC1155WrapperFactory.new(
+        const factory = await ERC1155WrapperFactory.deploy(
             wrapperImplementation.address,
             conditionalTokensAddress
         );
+        await factory.deployed();
 
         console.log(
             `wrapper implementation deployed at address ${wrapperImplementation.address}`
