@@ -1,6 +1,6 @@
 {
     "name": "erc1155-to-erc20-wrapper-contracts",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "A contract suite to deploy ERC20 wrappers for ERC1155 tokens.",
     "files": [
         "/*.sol",
