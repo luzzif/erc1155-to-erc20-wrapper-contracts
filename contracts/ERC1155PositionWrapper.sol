@@ -1,12 +1,26 @@
-// SPDX-License-Identifier: GPL-3.0
-
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155ReceiverUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/IERC1155Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract ERC1155Wrapper is ERC20Upgradeable, IERC1155ReceiverUpgradeable {
+/**
+ * @title ERC1155PositionWrapper
+ * @dev ERC1155PositionWrapper contract
+ * @author Federico Luzzi - <fedeluzzi00@gmail.com>
+ * SPDX-License-Identifier: GPL-3.0
+ *
+ * Error messages:
+ *   EW01: the contract is already initialized.
+ *   EW02: the received tokens are not sent by the supported ERC1155 instance, forbidden.
+ *   EW03: the received tokens do not have the right position id to be wrapped.
+ *   EW04: the user tried to withdraw/unwrap more tokens than what they hold.
+ */
+contract ERC1155PositionWrapper is
+    ERC20Upgradeable,
+    IERC1155ReceiverUpgradeable
+{
     bool private initialized;
     uint256 public positionId;
     address public wrappedERC1155Address;
@@ -25,8 +39,8 @@ contract ERC1155Wrapper is ERC20Upgradeable, IERC1155ReceiverUpgradeable {
         string calldata _symbol,
         address _wrappedERC1155Address,
         uint256 _positionId
-    ) external {
-        require(!initialized, "ERC1155Wrapper: already initialized");
+    ) external initializer {
+        require(!initialized, "EW01");
         __ERC20_init(_name, _symbol);
         positionId = _positionId;
         wrappedERC1155Address = _wrappedERC1155Address;
@@ -44,17 +58,14 @@ contract ERC1155Wrapper is ERC20Upgradeable, IERC1155ReceiverUpgradeable {
     }
 
     function onERC1155Received(
-        address,
+        address, // not needed
         address _from,
         uint256 _id,
         uint256 _amount,
-        bytes calldata
+        bytes calldata // not needed
     ) external override returns (bytes4) {
-        require(
-            msg.sender == wrappedERC1155Address,
-            "ERC1155Wrapper: forbidden"
-        );
-        require(_id == positionId, "ERC1155Wrapper: wrong position id");
+        require(msg.sender == wrappedERC1155Address, "EW02");
+        require(_id == positionId, "EW03");
         _mint(_from, _amount);
         emit Deposited(_from, _amount);
         return bytes4(0xf23a6e61);
@@ -72,10 +83,7 @@ contract ERC1155Wrapper is ERC20Upgradeable, IERC1155ReceiverUpgradeable {
     }
 
     function withdraw(uint256 _amount) external {
-        require(
-            balanceOf(msg.sender) >= _amount,
-            "ERC1155Wrapper: not enough balance"
-        );
+        require(balanceOf(msg.sender) >= _amount, "EW04");
         _burn(msg.sender, _amount);
         IERC1155Upgradeable(wrappedERC1155Address).safeTransferFrom(
             address(this),
