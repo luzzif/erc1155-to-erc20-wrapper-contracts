@@ -16,8 +16,9 @@ contract ERC1155PositionWrapperFactory {
 
     event WrapperCreated(uint256 positionId, address wrapperAddress);
 
-    constructor(address _erc1155Address) {
+    constructor(address _implementation, address _erc1155Address) {
         erc1155Address = _erc1155Address;
+        implementation = _implementation;
     }
 
     function createWrapper(
