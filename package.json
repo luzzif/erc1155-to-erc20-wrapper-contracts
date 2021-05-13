@@ -14,6 +14,8 @@
         "compile": "hardhat compile",
         "lint": "yarn lint:eslint && yarn lint:prettier",
         "test": "hardhat test",
+        "prepack": "cp ./contracts/*.sol ./ && mkdir ./interfaces && cp ./contracts/interfaces/*.sol ./interfaces",
+        "postpack": "rm -rf ./*.sol rm -rf ./interfaces",
         "test:coverage": "hardhat coverage",
         "test:gasreport": "cross-env GAS_REPORT_ENABLED=true hardhat test",
         "deploy:rinkeby": "hardhat deploy --network rinkeby --verify --conditional-tokens-address 0x36bede640D19981A82090519bC1626249984c908"
